@@ -55,9 +55,8 @@ var yAxisRight = d3.svg.axis()
 
 var svg = d3.select('body').append('svg')
     .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom);
-
-svg.append('g')
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 var sunset_line = d3.svg.line()
@@ -92,35 +91,27 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
 
     svg.append('g')
         .attr('class', 'x axis')
-        .attr('transform', 
-              'translate(' + margin.left + ',' + (margin.top + height) + ')')
+        .attr('transform', 'translate(0,' + height + ')')
         .call(xAxis);
 
     svg.append('g')
         .attr('class', 'y axis')
-        .attr('transform', 
-              'translate(' + margin.left + ',' + margin.top + ')')
         .call(yAxis);
 
     svg.append('g')
         .attr('class', 'y axis')
-        .attr('transform', 
-              'translate(' + (width + margin.left) + ',' + margin.top + ')')
+        .attr('transform', 'translate(' + width + ',0)')
         .call(yAxisRight);
 
     svg.append('path')
        .datum(data)
        .attr('class', 'line')
-       .attr('d', sunset_line)
-       .attr('transform',
-             'translate(' + margin.left + ',' + margin.top + ')');
+       .attr('d', sunset_line);
 
     svg.append('path')
        .datum(data)
        .attr('class', 'line')
-       .attr('d', sunrise_line)
-       .attr('transform',
-             'translate(' + margin.left + ',' + margin.top + ')');
+       .attr('d', sunrise_line);
 });
     </script>
 </body>
