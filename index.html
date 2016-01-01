@@ -68,7 +68,6 @@ var sunrise_line = d3.svg.line()
     .x(function (d) { return x(d.date); })
     .y(function (d) { return y(d.sunrise); });
 
-
 function read_row(row) {
     var time_format = d3.time.format('%H:%M');
     var date = new Date(+row.Year, +row.Month-1, +row.Day);
@@ -78,12 +77,6 @@ function read_row(row) {
         sunset: time_format.parse(row.Sunset)
     };
 
-//  data.sunrise.setFullYear(date.getFullYear(),
-//                           date.getMonth(),
-//                           date.getDate());
-//  data.sunset.setFullYear(date.getFullYear(),
-//                          date.getMonth(),
-//                          date.getDate());
     return data;
 }
 
@@ -99,30 +92,35 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
 
     svg.append('g')
         .attr('class', 'x axis')
-        .attr('transform', 'translate(' + margin.left + ',' + height + ')')
+        .attr('transform', 
+              'translate(' + margin.left + ',' + (margin.top + height) + ')')
         .call(xAxis);
 
     svg.append('g')
         .attr('class', 'y axis')
-        .attr('transform', 'translate(' + margin.left + ', 0)')
+        .attr('transform', 
+              'translate(' + margin.left + ',' + margin.top + ')')
         .call(yAxis);
 
     svg.append('g')
         .attr('class', 'y axis')
-        .attr('transform', 'translate(' + (width + margin.left) + ', 0)')
+        .attr('transform', 
+              'translate(' + (width + margin.left) + ',' + margin.top + ')')
         .call(yAxisRight);
 
     svg.append('path')
        .datum(data)
        .attr('class', 'line')
        .attr('d', sunset_line)
-       .attr('transform', 'translate(' + margin.left + ', 0)');
+       .attr('transform',
+             'translate(' + margin.left + ',' + margin.top + ')');
 
     svg.append('path')
        .datum(data)
        .attr('class', 'line')
        .attr('d', sunrise_line)
-       .attr('transform', 'translate(' + margin.left + ', 0)');
+       .attr('transform',
+             'translate(' + margin.left + ',' + margin.top + ')');
 });
     </script>
 </body>
