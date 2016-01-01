@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+</head>
+<body>
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+</style>
+    <script src='//d3js.org/d3.v3.min.js' charset='utf-8'></script>
+    <script type='text/javascript'>
+var margin = {left: 40, top: 30, right: 40, bottom: 30};
+var width = 960 - margin.left - margin.right;
+var height = 600 - margin.top - margin.bottom;
+
+var x = d3.time.scale().range([0, width]);
+var y = d3.time.scale().range([height, 0]);
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient('bottom');
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient('left')
+    .tickFormat(d3.time.format.multi([
+        ['%H%M', function (d) { return d.getHours(); }]
+        ]));
+var yAxisRight = d3.svg.axis()
+    .scale(y)
+    .orient('right')
+    .tickFormat(d3.time.format.multi([
+        ['%H%M', function (d) { return d.getHours(); }]
+        ]));
+        
+
+var svg = d3.select('body').append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom);
+
+svg.append('g')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+var sunset_line = d3.svg.line()
+    .x(function (d) { return x(d.date); })
+    .y(function (d) { return y(d.sunset); });
+
+var sunrise_line = d3.svg.line()
+    .x(function (d) { return x(d.date); })
+    .y(function (d) { return y(d.sunrise); });
+
+
+function read_row(row) {
+    var time_format = d3.time.format('%H:%M');
+    var date = new Date(+row.Year, +row.Month-1, +row.Day);
+    var data = {
+        date: date,
+        sunrise: time_format.parse(row.Sunrise),
+        sunset: time_format.parse(row.Sunset)
+    };
+
+//  data.sunrise.setFullYear(date.getFullYear(),
+//                           date.getMonth(),
+//                           date.getDate());
+//  data.sunset.setFullYear(date.getFullYear(),
+//                          date.getMonth(),
+//                          date.getDate());
+    return data;
+}
+
+d3.csv('suntimes.txt', read_row, function (error, data) {
+    if (error) {
+        throw error;
+    }
+
+    x.domain(d3.extent(data, function (d) { return d.date }));
+    y.domain([d3.time.format('%H:%M').parse('05:00'),
+              d3.time.format('%H:%M').parse('19:00')]);
+    y.ticks(d3.time.hour, 1);
+
+    svg.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', 'translate(' + margin.left + ',' + height + ')')
+        .call(xAxis);
+
+    svg.append('g')
+        .attr('class', 'y axis')
+        .attr('transform', 'translate(' + margin.left + ', 0)')
+        .call(yAxis);
+
+    svg.append('g')
+        .attr('class', 'y axis')
+        .attr('transform', 'translate(' + (width + margin.left) + ', 0)')
+        .call(yAxisRight);
+
+    svg.append('path')
+       .datum(data)
+       .attr('class', 'line')
+       .attr('d', sunset_line)
+       .attr('transform', 'translate(' + margin.left + ', 0)');
+
+    svg.append('path')
+       .datum(data)
+       .attr('class', 'line')
+       .attr('d', sunrise_line)
+       .attr('transform', 'translate(' + margin.left + ', 0)');
+});
+    </script>
+</body>
+</html>
