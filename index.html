@@ -12,19 +12,25 @@ body {
 
 .axis path,
 .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
 }
 
 .x.axis path {
-  display: none;
+    display: none;
 }
 
 .line {
-  fill: none;
-  stroke: steelblue;
-  stroke-width: 1.5px;
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+.equinox {
+    fill: none;
+    stroke: black;
+    stroke-width: 1px;
 }
 
 </style>
@@ -112,6 +118,14 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
        .datum(data)
        .attr('class', 'line')
        .attr('d', sunrise_line);
+
+    var equinox = data[58]; // nasty manual lookup.
+    svg.append('line')
+       .attr('class', 'equinox')
+       .attr('x1', x(equinox.date))
+       .attr('y1', y(equinox.sunrise))
+       .attr('x2', x(equinox.date))
+       .attr('y2', y(equinox.sunset));
 });
     </script>
 </body>
