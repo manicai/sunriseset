@@ -34,7 +34,7 @@ body {
 }
 
 
-.equinox {
+.solstice {
     fill: none;
     stroke: black;
     stroke-width: 1px;
@@ -156,13 +156,13 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
        .attr('class', 'fulldark')
        .attr('d', lighting_down);
 
-    var equinox = data[58]; // nasty manual lookup.
+    var solstice = data[58]; // nasty manual lookup.
     svg.append('line')
-       .attr('class', 'equinox')
-       .attr('x1', x(equinox.date))
-       .attr('y1', y(equinox.sunrise))
-       .attr('x2', x(equinox.date))
-       .attr('y2', y(equinox.sunset));
+       .attr('class', 'solstice')
+       .attr('x1', x(solstice.date))
+       .attr('y1', y(solstice.sunrise))
+       .attr('x2', x(solstice.date))
+       .attr('y2', y(solstice.sunset));
 });
     </script>
 </body>
