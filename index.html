@@ -22,13 +22,13 @@ body {
 }
 
 .line {
-    fill: none;
+    fill: steelblue;
     stroke: steelblue;
     stroke-width: 1.5px;
 }
 
 .lightline {
-    fill: none;
+    fill: darkblue;
     stroke: darkblue;
     stroke-width: 1.5px;
 }
@@ -71,21 +71,25 @@ var svg = d3.select('body').append('svg')
     .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-var sunset_line = d3.svg.line()
+var sunset_line = d3.svg.area()
     .x(function (d) { return x(d.date); })
-    .y(function (d) { return y(d.sunset); });
+    .y0(0)
+    .y1(function (d) { return y(d.sunset); });
 
-var sunrise_line = d3.svg.line()
+var sunrise_line = d3.svg.area()
     .x(function (d) { return x(d.date); })
-    .y(function (d) { return y(d.sunrise); });
+    .y0(height)
+    .y1(function (d) { return y(d.sunrise); });
 
-var lighting_down_line = d3.svg.line()
+var lighting_down_line = d3.svg.area()
     .x(function (d) { return x(d.date); })
-    .y(function (d) { return y(add_minutes(d.sunrise, -30)); });
+    .y0(height)
+    .y1(function (d) { return y(add_minutes(d.sunrise, -30)); });
 
-var lighting_up_line = d3.svg.line()
+var lighting_up_line = d3.svg.area()
     .x(function (d) { return x(d.date); })
-    .y(function (d) { return y(add_minutes(d.sunset, 30)); });
+    .y0(0)
+    .y1(function (d) { return y(add_minutes(d.sunset, 30)); });
 
 
 function read_row(row) {
@@ -137,11 +141,11 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
        .attr('class', 'line')
        .attr('d', sunset_line);
 
+
     svg.append('path')
        .datum(data)
        .attr('class', 'lightline')
        .attr('d', lighting_up_line);
-
 
     svg.append('path')
        .datum(data)
