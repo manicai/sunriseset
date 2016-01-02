@@ -33,6 +33,12 @@ body {
     stroke-width: 1.5px;
 }
 
+.midday {
+    fill: none;
+    stroke: orange;
+    stroke-width: 1px;
+    font-weight: 100;
+}
 
 .solstice {
     fill: none;
@@ -40,6 +46,11 @@ body {
     stroke-width: 1px;
 }
 
+.noon {
+    fill: none;
+    stroke: gray;
+    stroke-width: 0.5px;
+}
 </style>
     <script src='//d3js.org/d3.v3.min.js' charset='utf-8'></script>
     <script type='text/javascript'>
@@ -91,6 +102,10 @@ var lighting_up = d3.svg.area()
     .y0(0)
     .y1(function (d) { return y(add_minutes(d.sunset, 30)); });
 
+var midday = d3.svg.line()
+    .x(function (d) { return x(d.date); })
+    .y(function (d) { return y(new Date((d.sunrise.getTime() + d.sunset.getTime()) / 2)); });
+
 function read_row(row) {
     var time_format = d3.time.format('%H:%M');
     var date = new Date(+row.Year, +row.Month-1, +row.Day);
@@ -111,14 +126,24 @@ function add_minutes(date, minutes) {
     return result;
 }
 
+function time_of_day(hour, minute) {
+    // To match D3's default parse date.
+    var result = new Date(0, 0, 1);
+    result.setHours(hour);
+    if (typeof(minute) !== 'undefined') {
+        result.setMinutes(minute);
+    }
+
+    return result;
+}
+
 d3.csv('suntimes.txt', read_row, function (error, data) {
     if (error) {
         throw error;
     }
 
     x.domain(d3.extent(data, function (d) { return d.date }));
-    y.domain([d3.time.format('%H:%M').parse('05:00'),
-              d3.time.format('%H:%M').parse('19:00')]);
+    y.domain([time_of_day(5, 0), time_of_day(19, 0)]);
     y.ticks(d3.time.hour, 1);
 
     svg.append('g')
@@ -139,7 +164,6 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
        .datum(data)
        .attr('class', 'twilight')
        .attr('d', sunset);
-
 
     svg.append('path')
        .datum(data)
@@ -163,6 +187,26 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
        .attr('y1', y(solstice.sunrise))
        .attr('x2', x(solstice.date))
        .attr('y2', y(solstice.sunset));
+
+    svg.append('line')
+       .attr('class', 'noon')
+       .attr('x1', 0)
+       .attr('y1', y(time_of_day(12, 0)))
+       .attr('x2', width)
+       .attr('y2', y(time_of_day(12, 0)));
+
+    svg.append('path')
+       .datum(data)
+       .attr('class', 'midday')
+       .attr('d', midday);
+
+    svg.append('text')
+       .text('Middle of day')
+       .attr('class', 'midday')
+       .attr('y', y(time_of_day(11, 40)))
+       .attr('x', 5)
+       .attr('dy', '0.71em')
+       .style('text-anchor', 'top');
 });
     </script>
 </body>
