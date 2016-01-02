@@ -27,6 +27,13 @@ body {
     stroke-width: 1.5px;
 }
 
+.lightline {
+    fill: none;
+    stroke: darkblue;
+    stroke-width: 1.5px;
+}
+
+
 .equinox {
     fill: none;
     stroke: black;
@@ -58,7 +65,6 @@ var yAxisRight = d3.svg.axis()
         ['%H%M', function (d) { return d.getHours(); }]
         ]));
         
-
 var svg = d3.select('body').append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
@@ -73,6 +79,15 @@ var sunrise_line = d3.svg.line()
     .x(function (d) { return x(d.date); })
     .y(function (d) { return y(d.sunrise); });
 
+var lighting_down_line = d3.svg.line()
+    .x(function (d) { return x(d.date); })
+    .y(function (d) { return y(add_minutes(d.sunrise, -30)); });
+
+var lighting_up_line = d3.svg.line()
+    .x(function (d) { return x(d.date); })
+    .y(function (d) { return y(add_minutes(d.sunset, 30)); });
+
+
 function read_row(row) {
     var time_format = d3.time.format('%H:%M');
     var date = new Date(+row.Year, +row.Month-1, +row.Day);
@@ -83,6 +98,14 @@ function read_row(row) {
     };
 
     return data;
+}
+
+function add_minutes(date, minutes) {
+    var result = new Date(date);
+    // Won't work across daylight savings time but we aren't
+    // spanning that at any point.
+    result.setMinutes(result.getMinutes() + minutes);
+    return result;
 }
 
 d3.csv('suntimes.txt', read_row, function (error, data) {
@@ -116,8 +139,19 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
 
     svg.append('path')
        .datum(data)
+       .attr('class', 'lightline')
+       .attr('d', lighting_up_line);
+
+
+    svg.append('path')
+       .datum(data)
        .attr('class', 'line')
        .attr('d', sunrise_line);
+
+    svg.append('path')
+       .datum(data)
+       .attr('class', 'lightline')
+       .attr('d', lighting_down_line);
 
     var equinox = data[58]; // nasty manual lookup.
     svg.append('line')
