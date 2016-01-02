@@ -53,8 +53,8 @@ body {
 }
 
 .commute {
-    fill: #BBB;
-    opacity: 0.3;
+    fill: #BDECB6;
+    opacity: 0.7;
 }
 </style>
     <script src='//d3js.org/d3.v3.min.js' charset='utf-8'></script>
@@ -181,7 +181,7 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
 
     // I need to understand SVG transforms better ...
     svg.append('text')
-       .attr('transform', 'rotate(-90) translate(' + (-y(solstice.sunset) - 5) + ',' + (x(solstice.date) + 5) + ')')
+       .attr('transform', 'translate(' + (x(solstice.date) + 5) + ',' + (y(solstice.sunset) + 5) + ') rotate(-90)')
        .attr('dy', '.71em')
        .style('text-anchor', 'end')
        .text('Winter Solstice');
