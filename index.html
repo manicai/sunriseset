@@ -21,13 +21,13 @@ body {
     display: none;
 }
 
-.line {
+.twilight {
     fill: steelblue;
     stroke: steelblue;
     stroke-width: 1.5px;
 }
 
-.lightline {
+.fulldark {
     fill: darkblue;
     stroke: darkblue;
     stroke-width: 1.5px;
@@ -71,26 +71,25 @@ var svg = d3.select('body').append('svg')
     .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-var sunset_line = d3.svg.area()
+var sunset = d3.svg.area()
     .x(function (d) { return x(d.date); })
     .y0(0)
     .y1(function (d) { return y(d.sunset); });
 
-var sunrise_line = d3.svg.area()
+var sunrise = d3.svg.area()
     .x(function (d) { return x(d.date); })
     .y0(height)
     .y1(function (d) { return y(d.sunrise); });
 
-var lighting_down_line = d3.svg.area()
+var lighting_down = d3.svg.area()
     .x(function (d) { return x(d.date); })
     .y0(height)
     .y1(function (d) { return y(add_minutes(d.sunrise, -30)); });
 
-var lighting_up_line = d3.svg.area()
+var lighting_up = d3.svg.area()
     .x(function (d) { return x(d.date); })
     .y0(0)
     .y1(function (d) { return y(add_minutes(d.sunset, 30)); });
-
 
 function read_row(row) {
     var time_format = d3.time.format('%H:%M');
@@ -138,24 +137,24 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
 
     svg.append('path')
        .datum(data)
-       .attr('class', 'line')
-       .attr('d', sunset_line);
+       .attr('class', 'twilight')
+       .attr('d', sunset);
 
 
     svg.append('path')
        .datum(data)
-       .attr('class', 'lightline')
-       .attr('d', lighting_up_line);
+       .attr('class', 'fulldark')
+       .attr('d', lighting_up);
 
     svg.append('path')
        .datum(data)
-       .attr('class', 'line')
-       .attr('d', sunrise_line);
+       .attr('class', 'twilight')
+       .attr('d', sunrise);
 
     svg.append('path')
        .datum(data)
-       .attr('class', 'lightline')
-       .attr('d', lighting_down_line);
+       .attr('class', 'fulldark')
+       .attr('d', lighting_down);
 
     var equinox = data[58]; // nasty manual lookup.
     svg.append('line')
