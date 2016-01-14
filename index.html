@@ -73,6 +73,8 @@ var months = ['January', 'February', 'March', 'April',
               'September', 'October', 'November', 'December'];
 var width = 960 - margin.left - margin.right;
 var height = 600 - margin.top - margin.bottom;
+var hour_format = d3.time.format("%H%M");
+var date_format = d3.time.format('%e %b');
 
 var x = d3.time.scale().range([0, width]);
 var y = d3.time.scale().range([height, 0]);
@@ -161,10 +163,6 @@ function round_date(date) {
 
   date.setHours(0, 0, 0, 0);
   return date;
-}
-
-function format_date(date) {
-  return String(date.getDate()) + ' ' + months[date.getMonth()];
 }
 
 function find_index(date, dates) {
@@ -306,18 +304,33 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
        .style('text-anchor', 'start')
        .text('');
 
+    overlay_sunset = overlay.append('text')
+      .attr('x', 5)
+      .text('');
+
+    overlay_sunrise = overlay.append('text')
+      .attr('x', 5)
+      .text('');
+
     function on_mouse_move() {
         var mouse_x = d3.mouse(this)[0],
             date = round_date(x.invert(mouse_x)),
             position = x(round_date(date)),
-            index = find_index(date, data);
+            index = find_index(date, data),
+            data_point;
         
         overlay.attr('transform', 'translate(' + position + ',0)');
         if (index !== -1) {
           overlay.style('display', '');
           overlay_bar.attr('y1', y(data[index].sunrise));
           overlay_bar.attr('y2', y(data[index].sunset));
-          overlay_text.text(format_date(date));
+          overlay_text.text(date_format(date));
+
+          overlay_sunset.attr('y', y(data[index].sunset) + 10)
+                        .text(hour_format(data[index].sunset));
+
+          overlay_sunrise.attr('y', y(data[index].sunrise) - 5)
+                         .text(hour_format(data[index].sunrise));
         } else {
           overlay.style('display', 'none');
         }
