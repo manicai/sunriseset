@@ -1,10 +1,7 @@
 var margin = {left: 40, top: 30, right: 40, bottom: 30};
-var months = ['January', 'February', 'March', 'April',
-              'May', 'June', 'July', 'August',
-              'September', 'October', 'November', 'December'];
 var width = 960 - margin.left - margin.right;
 var height = 600 - margin.top - margin.bottom;
-var hour_format = d3.time.format("%H%M");
+var hour_format = d3.time.format('%H%M');
 var date_format = d3.time.format('%e %b');
 
 var x = d3.time.scale().range([0, width]);
@@ -17,13 +14,13 @@ var yAxis = d3.svg.axis()
     .orient('left')
     .tickFormat(d3.time.format.multi([
         ['%H%M', function (d) { return d.getHours(); }]
-        ]));
+    ]));
 var yAxisRight = d3.svg.axis()
     .scale(y)
     .orient('right')
     .tickFormat(d3.time.format.multi([
         ['%H%M', function (d) { return d.getHours(); }]
-        ]));
+    ]));
         
 var svg = d3.select('body').append('svg')
     .attr('width', width + margin.left + margin.right)
@@ -87,32 +84,34 @@ function time_of_day(hour, minute) {
 }
 
 function round_date(date) {
-  if (date.getHours() >= 12) {
-    // Will work even at the end of the month.
-    date.setDate(date.getDate() + 1)
-  }
+    if (date.getHours() >= 12) {
+        // Will work even at the end of the month.
+        date.setDate(date.getDate() + 1);
+    }
 
-  date.setHours(0, 0, 0, 0);
-  return date;
+    date.setHours(0, 0, 0, 0);
+    return date;
 }
 
 function find_index(date, dates) {
-  var i = 0;
-  for (i = 0; i < dates.length; i += 1) {
-    if (dates[i].date.getTime() === date.getTime()) {
-      return i;
+    var i = 0;
+    for (i = 0; i < dates.length; i += 1) {
+        if (dates[i].date.getTime() === date.getTime()) {
+            return i;
+        }
     }
-  }
 
-  return -1;
+    return -1;
 }
 
 d3.csv('suntimes.txt', read_row, function (error, data) {
+    var overlay, overlay_bar, overlay_sunrise, overlay_sunset, overlay_text;
+
     if (error) {
         throw error;
     }
 
-    x.domain(d3.extent(data, function (d) { return d.date }));
+    x.domain(d3.extent(data, function (d) { return d.date; }));
     y.domain([time_of_day(5, 0), time_of_day(19, 0)]);
     y.ticks(d3.time.hour, 1);
 
@@ -247,23 +246,22 @@ d3.csv('suntimes.txt', read_row, function (error, data) {
         var mouse_x = d3.mouse(this)[0],
             date = round_date(x.invert(mouse_x)),
             position = x(round_date(date)),
-            index = find_index(date, data),
-            data_point;
+            index = find_index(date, data);
         
         overlay.attr('transform', 'translate(' + position + ',0)');
         if (index !== -1) {
-          overlay.style('display', '');
-          overlay_bar.attr('y1', y(data[index].sunrise));
-          overlay_bar.attr('y2', y(data[index].sunset));
-          overlay_text.text(date_format(date));
+            overlay.style('display', '');
+            overlay_bar.attr('y1', y(data[index].sunrise));
+            overlay_bar.attr('y2', y(data[index].sunset));
+            overlay_text.text(date_format(date));
 
-          overlay_sunset.attr('y', y(data[index].sunset) + 10)
-                        .text(hour_format(data[index].sunset));
+            overlay_sunset.attr('y', y(data[index].sunset) + 10)
+                          .text(hour_format(data[index].sunset));
 
-          overlay_sunrise.attr('y', y(data[index].sunrise) - 5)
-                         .text(hour_format(data[index].sunrise));
+            overlay_sunrise.attr('y', y(data[index].sunrise) - 5)
+                           .text(hour_format(data[index].sunrise));
         } else {
-          overlay.style('display', 'none');
+            overlay.style('display', 'none');
         }
     }
 
